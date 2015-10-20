@@ -2,18 +2,20 @@
 #define __HEAP_H
 #define STD_BUFFER 10
 
-template <class T>
-struct Greater {
-  bool operator()(const T& lhs, const T& rhs);
+template <class T> struct Greater {
+  bool operator()(const T &lhs, const T &rhs) { return lhs > rhs; }
 };
 
-template <class T, class Compare = Greater<T> >
-class Heap {
-  typedef T* iterator;
+template <class T> struct Smaller {
+  bool operator()(const T &lhs, const T &rhs) { return lhs < rhs; }
+};
 
- private:
-  T* elem;  // a pointer to the first object
-  int space;  // the index of the first free object
+template <class T, class Compare = Greater<T> > class Heap {
+  typedef T *iterator;
+
+private:
+  T *elem;   // a pointer to the first object
+  int space; // the index of the first free object
   int last;  // the index of one passed the last object
 
   int capacity();
@@ -21,15 +23,15 @@ class Heap {
   inline int freeSpace();
   void swap(int, int);
 
-  bool bubbleDown(int& k);
-  bool bubbleUp(int& k);
+  bool bubbleDown(int &k);
+  bool bubbleUp(int &k);
   Compare comp;
 
- public:
+public:
   Heap();
   ~Heap();
 
-  T& top();
+  T &top();
   T pop();
   void insert(T);
 #ifdef __PC
@@ -38,33 +40,22 @@ class Heap {
   int size();
 };
 
-template <class T>
-bool Greater<T>::operator()(const T& lhs, const T& rhs) {
-  return lhs > rhs;
-}
-
-template <class T, class Compare>
-Heap<T, Compare>::Heap() {
+template <class T, class Compare> Heap<T, Compare>::Heap() {
   elem = new T[STD_BUFFER];
   space = 0;
   last = STD_BUFFER;
 }
 
-template <class T, class Compare>
-Heap<T, Compare>::~Heap() {
-  delete[] elem;
-}
+template <class T, class Compare> Heap<T, Compare>::~Heap() { delete[] elem; }
 
-template <class T, class Compare>
-inline int Heap<T, Compare>::freeSpace() {
+template <class T, class Compare> inline int Heap<T, Compare>::freeSpace() {
   return last - space;
 }
 
-template <class T, class Compare>
-void Heap<T, Compare>::reallocate() {
+template <class T, class Compare> void Heap<T, Compare>::reallocate() {
   int s = size();
   int newSize = s * 2;
-  T* newElem = new T[newSize];
+  T *newElem = new T[newSize];
   for (int i = 0; i != s; i++) {
     newElem[i] = elem[i];
   }
@@ -74,15 +65,13 @@ void Heap<T, Compare>::reallocate() {
   last = newSize;
 }
 
-template <class T, class Compare>
-void Heap<T, Compare>::swap(int i, int j) {
+template <class T, class Compare> void Heap<T, Compare>::swap(int i, int j) {
   T temp = elem[i];
   elem[i] = elem[j];
   elem[j] = temp;
 }
 
-template <class T, class Compare>
-bool Heap<T, Compare>::bubbleDown(int& k) {
+template <class T, class Compare> bool Heap<T, Compare>::bubbleDown(int &k) {
   int lc = k * 2 + 1, rc = lc + 1;
   // it is possible that some of the childs are outside of the allocated space
 
@@ -92,21 +81,21 @@ bool Heap<T, Compare>::bubbleDown(int& k) {
 
   if (lb && rb) {
     if (comp(elem[k], elem[lc]) && comp(elem[k], elem[rc])) {
-      return true;  // no need to bubble down
+      return true; // no need to bubble down
     }
 
-    if (comp(elem[lc], elem[rc]))  // left child is greater
+    if (comp(elem[lc], elem[rc])) // left child is greater
     {
       swap(k, lc);
       k = lc;
       return false;
-    } else {  // right child is greater
+    } else { // right child is greater
       swap(k, rc);
       k = rc;
       return false;
     }
   } else if (lb) {
-    if (comp(elem[lc], elem[k]))  // left child is greater
+    if (comp(elem[lc], elem[k])) // left child is greater
     {
       swap(k, lc);
       k = lc;
@@ -119,25 +108,23 @@ bool Heap<T, Compare>::bubbleDown(int& k) {
   }
 }
 
-template <class T, class Compare>
-bool Heap<T, Compare>::bubbleUp(int& k) {
-  int ik = (k - 1) / 2;  // parent index
+template <class T, class Compare> bool Heap<T, Compare>::bubbleUp(int &k) {
+  int ik = (k - 1) / 2; // parent index
   if (k == 0 || comp(elem[ik], elem[k])) {
     return true;
-  } else {  // parent is smaller
+  } else { // parent is smaller
     swap(k, ik);
     k = ik;
     return false;
   }
 }
 
-template <class T, class Compare>
-T Heap<T, Compare>::pop() {
+template <class T, class Compare> T Heap<T, Compare>::pop() {
   T temp = *elem;
 
   if (space == 0)
-    return temp;  // so that if you pop an empty heap the program does not
-                  // crash. (but there is undefined behaviour)
+    return temp; // so that if you pop an empty heap the program does not
+                 // crash. (but there is undefined behaviour)
   --space;
   elem[0] = elem[space];
   int k = 0;
@@ -149,9 +136,9 @@ T Heap<T, Compare>::pop() {
   return temp;
 }
 
-template <class T, class Compare>
-void Heap<T, Compare>::insert(T key) {
-  if (freeSpace() == 0) reallocate();
+template <class T, class Compare> void Heap<T, Compare>::insert(T key) {
+  if (freeSpace() == 0)
+    reallocate();
 
   elem[space] = key;
   int k = space;
@@ -163,20 +150,14 @@ void Heap<T, Compare>::insert(T key) {
   }
 }
 
-template <class T, class Compare>
-T& Heap<T, Compare>::top() {
-  return *elem;
-}
+template <class T, class Compare> T &Heap<T, Compare>::top() { return *elem; }
 
-template <class T, class Compare>
-int Heap<T, Compare>::size() {
-  return space;
-}
+template <class T, class Compare> int Heap<T, Compare>::size() { return space; }
 
 #ifdef __PC
-template <class T, class Compare>
-void Heap<T, Compare>::print() {
-  for (int i = 0; i != space; i++) std::cout << " " << elem[i];
+template <class T, class Compare> void Heap<T, Compare>::print() {
+  for (int i = 0; i != space; i++)
+    std::cout << " " << elem[i];
 
   std::cout << std::endl;
 }
