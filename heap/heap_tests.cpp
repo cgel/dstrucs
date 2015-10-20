@@ -1,8 +1,6 @@
 #include "gtest/gtest.h"
 #include "heap.h"
 
-double root(double val) { return 1.0; }
-
 TEST(test_heap, heap) {
   Heap<int> h;
   h.insert(7);
@@ -12,7 +10,6 @@ TEST(test_heap, heap) {
   EXPECT_EQ(2, h.top());
   h.print();
 }
-
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
