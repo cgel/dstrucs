@@ -10,6 +10,7 @@ TEST(test_heap, heap) {
   EXPECT_EQ(7, h.top());
   h.pop();
   EXPECT_EQ(2, h.top());
+  h.print();
 }
 
 
