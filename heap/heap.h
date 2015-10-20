@@ -14,7 +14,7 @@ template <class T> struct Smaller {
 template <class T, class Compare = Greater<T> > class Heap {
 private:
   typedef T *iterator;
-  T *buff;   // a pointer to the first object
+  T *buff;    // a pointer to the first object
   int _empty; // the index of the first free object
   int _last;  // the index of one passed the last object
 
@@ -72,37 +72,35 @@ template <class T, class Compare> void Heap<T, Compare>::swap(int i, int j) {
 }
 
 template <class T, class Compare> void Heap<T, Compare>::bubbleDown(int index) {
-  int left_child = index * 2 + 1, right_child = left_child + 1;
-  // it is possible that some of the child indexes are constructed or outside the buffer range 
-  bool bubble_left = left_child < _empty;
-  bool bubble_right = right_child < _empty;
-  if (bubble_left && bubble_right) {
-    if (comp(buff[left_child], buff[right_child])) // left child is greater
+  int left_i = index * 2 + 1, right_i = left_i + 1;
+  // maybe buff[X_child] has not been initialized or is outside the range of
+  // buff
+  bool _left = left_i < _empty;
+  bool _right = right_i < _empty;
+  if (_left && _right) {
+    if (comp(buff[left_i], buff[right_i])) // left child is greater
     {
-      swap(index, left_child);
-      bubbleDown(left_child);
-    } else if (comp(buff[right_child], buff[left_child])){ // left child is greater
-      swap(index, right_child);
-      bubbleDown(right_child);
+      swap(index, left_i);
+      bubbleDown(left_i);
+    } else if (comp(buff[right_i], buff[left_i])) { // left child is greater
+      swap(index, right_i);
+      bubbleDown(right_i);
     }
-  } else if (bubble_left) {
-    if (comp(buff[left_child], buff[index])) // left child is greater
+  } else if (_left) {
+    if (comp(buff[left_i], buff[index])) // left child is greater
     {
-      swap(index, left_child);
-      bubbleDown(left_child);
+      swap(index, left_i);
+      bubbleDown(left_i);
     }
   }
-  return;
 }
 
 template <class T, class Compare> void Heap<T, Compare>::bubbleUp(int index) {
-  int parent_index = (index - 1) / 2; 
-  if (index == 0 || comp(buff[parent_index], buff[index])) {
-    return;
+  int parent_i = (index - 1) / 2;
+  if (index != 0 && comp(buff[index], buff[parent_i])) {
+    swap(index, parent_i);
+    bubbleUp(parent_i);
   }
-  swap(index, parent_index);
-  bubbleUp(parent_index);
-  return;
 }
 
 template <class T, class Compare> void Heap<T, Compare>::pop() {
@@ -116,7 +114,7 @@ template <class T, class Compare> void Heap<T, Compare>::pop() {
 
 template <class T, class Compare> void Heap<T, Compare>::insert(T new_key) {
   if (freeSpace() == 0) {
-    reallocate(); 
+    reallocate();
   }
   buff[_empty] = new_key;
   bubbleUp(_empty);
@@ -125,7 +123,9 @@ template <class T, class Compare> void Heap<T, Compare>::insert(T new_key) {
 
 template <class T, class Compare> T &Heap<T, Compare>::top() { return *buff; }
 
-template <class T, class Compare> int Heap<T, Compare>::size() { return _empty; }
+template <class T, class Compare> int Heap<T, Compare>::size() {
+  return _empty;
+}
 
 #ifdef __PC
 template <class T, class Compare> void Heap<T, Compare>::print() {
