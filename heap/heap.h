@@ -1,6 +1,6 @@
 #ifndef __HEAP_H
 #define __HEAP_H
-#define DEF_BUF_SIZE 16
+#define NEW_BUFF_TRIGGER 5 
 
 template <class T> struct Greater {
   bool operator()(const T &lhs, const T &rhs) { return lhs > rhs; }
@@ -19,7 +19,7 @@ private:
   int _last;  // the index of one passed the last object
 
   int capacity();
-  void reallocate();
+  void reallocate(T* newBuff, size_t newSize);
   inline int freeSpace();
   void swap(int, int);
 
@@ -41,9 +41,9 @@ public:
 };
 
 template <class T, class Compare> Heap<T, Compare>::Heap() {
-  buff = new T[DEF_BUFF_SIZE];
+  buff = new T[NEW_BUFF_TRIGGER/2];
   _empty = 0;
-  _last = DEF_BUFF_SIZE;
+  _last = NEW_BUFF_TRIGGER/2;
 }
 
 template <class T, class Compare> Heap<T, Compare>::~Heap() { delete[] buff; }
@@ -52,16 +52,13 @@ template <class T, class Compare> inline int Heap<T, Compare>::freeSpace() {
   return _last - _empty;
 }
 
-template <class T, class Compare> void Heap<T, Compare>::reallocate() {
-  int s = size();
-  int newSize = s * 2;
-  T *newBuff = new T[newSize];
-  for (int i = 0; i != s; i++) {
+template <class T, class Compare> void Heap<T, Compare>::reallocate(T* newBuff, size_t newSize) {
+  std::cout << "allocating: " << newSize << std::endl;
+  for (int i = 0; i != _empty; i++) {
     newBuff[i] = buff[i];
   }
   delete[] buff;
   buff = newBuff;
-  _empty = s;
   _last = newSize;
 }
 
@@ -109,12 +106,19 @@ template <class T, class Compare> void Heap<T, Compare>::pop() {
     buff[0] = buff[_empty];
     bubbleDown(0);
   }
+  if(_empty * NEW_BUFF_TRIGGER < _last) {
+    size_t newSize = _last/(NEW_BUFF_TRIGGER/2);
+    std::cout << "REDUCING BUFF SIZE TO: " << newSize << std::endl;
+    reallocate(new T[newSize], newSize);
+  }
   return;
 }
 
 template <class T, class Compare> void Heap<T, Compare>::insert(T new_key) {
   if (freeSpace() == 0) {
-    reallocate();
+    size_t newSize = _last*(NEW_BUFF_TRIGGER/2);
+    std::cout << "INCREASING BUFF SIZE TO: " << newSize << std::endl;
+    reallocate(new T[newSize], newSize);
   }
   buff[_empty] = new_key;
   bubbleUp(_empty);
