@@ -10,10 +10,10 @@ template <class T> struct Smaller {
   bool operator()(const T &lhs, const T &rhs) { return lhs < rhs; }
 };
 
+// compare(parent,child) is allways true
 template <class T, class Compare = Greater<T> > class Heap {
-  typedef T *iterator;
-
 private:
+  typedef T *iterator;
   T *elem;   // a pointer to the first object
   int space; // the index of the first free object
   int last;  // the index of one passed the last object
@@ -24,7 +24,7 @@ private:
   void swap(int, int);
 
   bool bubbleDown(int &k);
-  bool bubbleUp(int &k);
+  void bubbleUp(int k);
   Compare comp;
 
 public:
@@ -32,7 +32,7 @@ public:
   ~Heap();
 
   T &top();
-  T pop();
+  void pop();
   void insert(T);
 #ifdef __PC
   void print();
@@ -108,22 +108,19 @@ template <class T, class Compare> bool Heap<T, Compare>::bubbleDown(int &k) {
   }
 }
 
-template <class T, class Compare> bool Heap<T, Compare>::bubbleUp(int &k) {
-  int ik = (k - 1) / 2; // parent index
-  if (k == 0 || comp(elem[ik], elem[k])) {
-    return true;
-  } else { // parent is smaller
-    swap(k, ik);
-    k = ik;
-    return false;
+template <class T, class Compare> void Heap<T, Compare>::bubbleUp(int index) {
+  int parent_index = (index - 1) / 2; 
+  if (index == 0 || comp(elem[parent_index], elem[index])) {
+    return;
   }
+  swap(index, parent_index);
+  bubbleUp(parent_index);
+  return;
 }
 
-template <class T, class Compare> T Heap<T, Compare>::pop() {
-  T temp = *elem;
-
+template <class T, class Compare> void Heap<T, Compare>::pop() {
   if (space == 0)
-    return temp; // so that if you pop an empty heap the program does not
+    return; // so that if you pop an empty heap the program does not
                  // crash. (but there is undefined behaviour)
   --space;
   elem[0] = elem[space];
@@ -132,22 +129,15 @@ template <class T, class Compare> T Heap<T, Compare>::pop() {
   while (bubStop == false) {
     bubStop = bubbleDown(k);
   }
-
-  return temp;
+  return;
 }
 
-template <class T, class Compare> void Heap<T, Compare>::insert(T key) {
+template <class T, class Compare> void Heap<T, Compare>::insert(T new_key) {
   if (freeSpace() == 0)
     reallocate();
-
-  elem[space] = key;
-  int k = space;
-
+  elem[space] = new_key;
+  bubbleUp(space);
   space++;
-  bool bubStop = false;
-  while (bubStop == false) {
-    bubStop = bubbleUp(k);
-  }
 }
 
 template <class T, class Compare> T &Heap<T, Compare>::top() { return *elem; }

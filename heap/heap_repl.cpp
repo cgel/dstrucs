@@ -42,7 +42,8 @@ int main()
         case 'p':
         {
          // pop
-         int p = h.pop();
+         int p = h.top();
+         h.pop();
          cout << "poped: " << p << endl;
          h.print();
          break; /* optional */
