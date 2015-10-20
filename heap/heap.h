@@ -53,7 +53,6 @@ template <class T, class Compare> inline int Heap<T, Compare>::freeSpace() {
 }
 
 template <class T, class Compare> void Heap<T, Compare>::reallocate(T* newBuff, size_t newSize) {
-  std::cout << "allocating: " << newSize << std::endl;
   for (int i = 0; i != _empty; i++) {
     newBuff[i] = buff[i];
   }
@@ -108,7 +107,6 @@ template <class T, class Compare> void Heap<T, Compare>::pop() {
   }
   if(_empty * NEW_BUFF_TRIGGER < _last) {
     size_t newSize = _last/(NEW_BUFF_TRIGGER/2);
-    std::cout << "REDUCING BUFF SIZE TO: " << newSize << std::endl;
     reallocate(new T[newSize], newSize);
   }
   return;
@@ -117,7 +115,6 @@ template <class T, class Compare> void Heap<T, Compare>::pop() {
 template <class T, class Compare> void Heap<T, Compare>::insert(T new_key) {
   if (freeSpace() == 0) {
     size_t newSize = _last*(NEW_BUFF_TRIGGER/2);
-    std::cout << "INCREASING BUFF SIZE TO: " << newSize << std::endl;
     reallocate(new T[newSize], newSize);
   }
   buff[_empty] = new_key;
