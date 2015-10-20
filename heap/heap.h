@@ -1,6 +1,6 @@
 #ifndef __HEAP_H
 #define __HEAP_H
-#define STD_BUFFER 10
+#define DEF_BUF_SIZE 16
 
 template <class T> struct Greater {
   bool operator()(const T &lhs, const T &rhs) { return lhs > rhs; }
@@ -41,9 +41,9 @@ public:
 };
 
 template <class T, class Compare> Heap<T, Compare>::Heap() {
-  buff = new T[STD_BUFFER];
+  buff = new T[DEF_BUFF_SIZE];
   _empty = 0;
-  _last = STD_BUFFER;
+  _last = DEF_BUFF_SIZE;
 }
 
 template <class T, class Compare> Heap<T, Compare>::~Heap() { delete[] buff; }
