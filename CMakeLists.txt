@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(dstructs)
 
-set(CMAKE_CXX_FLAGS "-g -Wall")
+set(CMAKE_CXX_FLAGS "-g -Wall -O0")
+
+add_definitions(-D__PC)
 
 enable_testing()
 
